@@ -135,10 +135,9 @@ std::vector<std::pair<int,int>> astar(
 - In the node struct 'g', 'h' and 'f' are stored separately to avoid recalculating 'f' every time a node is compared.
 - The Node struct stores `parentRow` and `parentCol`, which record the coordinates of the cell that the algorithm came from when it first reach this node. Once the goal is reached, the parent fields are used to trace backwards from the goal to the start. Each node points to the cell it came from, which in turn points to its own parent. This chain is reversed to produce the final path. Without parent tracking you would have no way of knowing which cells the path passes through.
 - `std::priority_queue` uses `<` by default to make a max-heap, but by overloading `>` and passing `std::greater<Node>`, you get a min-heap so the lowest `f` node is always processed first.
-# AStarAlgorithm.cpp
+`## AStarAlgorithm.cpp
 
-```c++
-
+```cpp
 #include "AStarAlgorithm.h"
 #include <queue>          // priority_queue
 #include <vector>         // vector
@@ -210,7 +209,6 @@ static vector<pair<int,int>> reconstruct_path(
         path.emplace_back(cr, cc);
         auto it = cameFrom.find(encode(cr, cc, cols));
         if (it == cameFrom.end()) {
-            // Should not happen if called correctly, but return empty to be safe
             return {};
         }
         auto [pr, pc] = it->second;
@@ -233,18 +231,14 @@ vector<pair<int,int>> astar(
     auto [sr, sc] = start;
     auto [gr, gc] = goal;
 
-    // Validate start/goal
     if (grid[sr][sc] == 1 || grid[gr][gc] == 1)
         return {};
 
-    // Min-heap: Node with lowest f on top, priority queue give you the smallest element first
     priority_queue<Node, vector<Node>, greater<Node>> openSet;
 
-    // Track best g-cost seen for each cell
     vector<vector<int>> bestG(rows, vector<int>(cols, INT_MAX));
     bestG[sr][sc] = 0;
 
-    // Store parent for path reconstruction: maps encoded pos -> (parentRow, parentCol)
     unordered_map<int, pair<int,int>> cameFrom;
 
     openSet.emplace(sr, sc, 0, heuristic(sr, sc, gr, gc), -1, -1);
@@ -254,24 +248,21 @@ vector<pair<int,int>> astar(
 
         int r = current.row, c = current.col;
 
-        // Skip stale entries
         if (current.g > bestG[r][c])
             continue;
 
-        // Record how we arrived here
         if (current.parentRow != -1) {
             cameFrom[encode(r, c, cols)] = {current.parentRow, current.parentCol};
         }
-        // Goal reached — reconstruct path
+
         if (r == gr && c == gc) {
             return reconstruct_path(cameFrom, start, goal, cols);
         }
 
-        // Explore neighbors of current
         explore_neighbors(grid, current, bestG, openSet, rows, cols, gr, gc);
     }
 
-    return {}; // No path found
+    return {};
 }
 ```
 
