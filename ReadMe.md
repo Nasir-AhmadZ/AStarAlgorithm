@@ -136,7 +136,9 @@ std::vector<std::pair<int,int>> astar(
 - The Node struct stores `parentRow` and `parentCol`, which record the coordinates of the cell that the algorithm came from when it first reach this node. Once the goal is reached, the parent fields are used to trace backwards from the goal to the start. Each node points to the cell it came from, which in turn points to its own parent. This chain is reversed to produce the final path. Without parent tracking you would have no way of knowing which cells the path passes through.
 - `std::priority_queue` uses `<` by default to make a max-heap, but by overloading `>` and passing `std::greater<Node>`, you get a min-heap so the lowest `f` node is always processed first.
 # AStarAlgorithm.cpp
+
 ```c++
+
 #include "AStarAlgorithm.h"
 #include <queue>          // priority_queue
 #include <vector>         // vector
