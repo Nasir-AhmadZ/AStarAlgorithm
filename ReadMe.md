@@ -1,29 +1,53 @@
+# A* Algorithm Theory
+
+## Background
+
+Before explaining how the A* algorithm works, it is helpful to understand two simpler algorithms that it builds upon: Dijkstra's algorithm and Greedy Best-First Search.
+
+## Dijkstra's Algorithm
+
+Dijkstra's algorithm works by visiting nodes in a graph starting from the starting node. It repeatedly examines the closest not yet visited node, adding it to the set of visited nodes. It expands outwards from the starting point in all directions until it reaches the goal. This algorithm is guaranteed to find the shortest path from the starting node, as long as none of the edges have a negative cost.
+
+## Greedy Best-First Search
+
+Greedy Best-First Search works in a similar way to Dijkstra's, except that it uses a heuristic; an estimate of how far any given node is from the goal. Instead of selecting the node closest to the start, it selects the node that appears closest to the goal. Greedy Best-First Search is not guaranteed to find the shortest path, however it runs much faster than Dijkstra's algorithm because the heuristic guides it towards the goal more directly.
+
+## A* Algorithm
+
+A* combines the strengths of both algorithms. Like Dijkstra's, it can find the shortest path. Like Greedy Best-First Search, it uses a heuristic to guide itself towards the goal efficiently. When used with a good heuristic, A* can be just as fast as Greedy Best-First Search while still guaranteeing the shortest path.
+
+A* assigns every node a score:
+
+$$f(n) = g(n) + h(n)$$
+
+- **g(n)**: the actual cost to reach node `n` from the start
+- **h(n)**: the heuristic estimate of the cost from node `n` to the goal
+- **f(n)**: the total estimated cost of the path through node `n`
+
+The algorithm always expands the node with the lowest `f(n)` first, which is why a min-heap priority queue is used.
+
+## Heuristics
+
+A heuristic estimates how far a node is from the goal. The true shortest distance cannot be known without finding the path first, so instead a value that is easy to compute is used, such as Manhattan distance.
+
+The behavior of A* depends heavily on the heuristic chosen:
+
+- If `h(n) = 0`, A* behaves identically to Dijkstra's algorithm, expanding in all directions with no guidance.
+- If `h(n)` is always less than or equal to the true cost, A* is guaranteed to find the shortest path. The lower `h(n)` is, the more nodes are expanded, making it slower.
+- If `h(n)` equals the true cost exactly, A* only follows the optimal path and never expands unnecessary nodes, making it as fast as possible.
+- If `h(n)` is sometimes greater than the true cost, A* may not find the shortest path, but it will run faster.
+- If `h(n)` is very large relative to `g(n)`, A* behaves like Greedy Best-First Search.
 
 
-# Dijkstra's & Greedy Best-First-Search Algorithm
-This works by visiting vertices in the graph starting with the object's starting point. It then repeatedly examines the closet not yet examined vertex adding its vertices to the set of vertices examined. It expands outwards from the starting point until it reaches the goal. This algorithm is guaranteed to find the shortest path from the starting point, as long as none of the edges have a negative cost.
+## Manhattan Distance
 
-The Greedy Best-First-Search algorithm works in a similar way, except that it has some estimate (heuristic) of how far from the goal any vertex is. Instead of selecting the vertex closest to the starting point, it selects the vertex closest to the goal. Greedy Best-First-search is not guaranteed to find a shortest path. However, it runs much quicker than Dijkstra's algorithm because it uses the heuristic function to guide its way towards the goal very quickly. 
-# A* Algorithm
-A* is like Dijkstra's algorithm in that in can be used to find a shortest path. A* is like the Greed Best First Search Algorithm in that it can use a heuristic to guide itself. It can be just as fast.
+Manhattan distance is commonly used as a heuristic for grid-based pathfinding. It measures the distance between two points by only moving along grid axes — no diagonals. The formula is:
 
-## A* Heuristic 
+$$d = |x_1 - x_2| + |y_1 - y_2|$$
 
-- At one extreme, if `h(n)` is 0, then only `g(n)` plays a role, and A* turns into Dijkstra's algorithm
-- If `h(n)` is always lower than or equal to the cost of moving from n to the goal, then A* is guaranteed to find the shortest path. The lower `h(n)` is, the more node a* expands, making it slower.
-- If `h(n)` is equal to cost of moving, then A* will only follow the best path and never expand anything else, making it very fast. Although you can't make this happen in all cases, you can make it exact in some special cases, It's nice to know that given perfect information A* will behave perfectly
-- If `h(n)` is sometimes greater than the cost of moving, then A* is not guaranteed to find a shortest path, but it can run faster.
-- At the other extreme, if `h(n)` is very high relative to `g(n)` then only `h(n)` plays a tole, and A* turns into Greedy Best-First-Search algorithm
+For example, moving from cell `(1, 1)` to cell `(3, 4)` on a grid requires moving 2 steps down and 3 steps right, giving a Manhattan distance of 5. This maps naturally to grid movement where only up, down, left, and right are allowed.
 
-[[C++ Mini Project - Code]]
-# Templates in C++
-A C++ template is a tool for creating generic classes or functions. This allows us to write code that works for any data type without rewriting it for each type.
-
-- Avoid code duplication by allowing one function or class to work with multiple data types, mainly allowing generic functions and classes.
-- Provides type safety unlike void* pointers or macros, and can be specialized for specific data types when needed.
-- Form the basis of [STL containers](https://www.geeksforgeeks.org/cpp/containers-cpp-stl/) and [algorithms](https://www.geeksforgeeks.org/cpp/c-magicians-stl-algorithms/) like vector, map, and sort.
-
-![[Pasted image 20260204100520.png]]
+# My Code
 
 # main.cpp
 
@@ -35,10 +59,10 @@ A C++ template is a tool for creating generic classes or functions. This allows 
 #include "Test.h"
 
 int main() {
-	//runAllTests();
-    //return 0;
-    
-    srand(time(0));
+     
+     //runAllTests();
+     //return 0;
+    //srand(time(0));
     int attempts = 0;
     const int MAX_ATTEMPTS = 10;
 
@@ -73,7 +97,9 @@ int main() {
 }
 ```
 
-- In order for `auto& [r,c] : path` to work I needed to use the ISO C++ 17 standard. The default in visual studio is ISO C++ 14 standard.
+- I am using a random number generator that chooses between 0 and 1 for creating a grid, '0' is open and '1' is a wall. This causes some issues, there will often be no path from start to end. To mitigate this issue, I have included a do-while loop that will generate the grid and try find a path between the start and end. The loop will do this 10 times or until a path is found. This makes the chances of no path being found smaller because we essentially have 10 grids, making it very likely for there to be a path in 1 of them. 
+- The reason I chose to do this is because I wanted to see the A* algorithm working during testing.
+- In order for `auto& [r, c] : path` to work I needed to use the C++ 17. Structured binding does not exist in version 14. This was introduced in C++ 17. In Visual Studio the default version is 14.
 # AStarAlgorithm.h
 
 ``` c++
@@ -106,6 +132,9 @@ std::vector<std::pair<int,int>> astar(
 
 ```
 
+- In the node struct 'g', 'h' and 'f' are stored separately to avoid recalculating 'f' every time a node is compared.
+- The Node struct stores `parentRow` and `parentCol`, which record the coordinates of the cell that the algorithm came from when it first reach this node. Once the goal is reached, the parent fields are used to trace backwards from the goal to the start. Each node points to the cell it came from, which in turn points to its own parent. This chain is reversed to produce the final path. Without parent tracking you would have no way of knowing which cells the path passes through.
+- `std::priority_queue` uses `<` by default to make a max-heap, but by overloading `>` and passing `std::greater<Node>`, you get a min-heap so the lowest `f` node is always processed first.
 # AStarAlgorithm.cpp
 ```c++
 #include "AStarAlgorithm.h"
@@ -244,11 +273,14 @@ vector<pair<int,int>> astar(
 }
 ```
 
-- ``heuristic()`` gets the Manhattan distance to the goal
+- ``heuristic()`` gets the Manhattan distance to the goal.
 - ``encode() ``turns rows and columns into a single number, for example for a 10 wide grid row 3, col 2 would be turned into 32. for an 11 wide grid row 3, col 2 would be turned into 35.
-- ``priority_queue`` gives you the smallest element first
+- ``priority_queue`` gives you the smallest element first.
 -  ``unordered_map`` was used instead of ``vector<vector<pair<int, int>>>`` of the same size as the grid, because only visited cells get an entry and it is faster at finding a cell's parent
 - ``emplace_back`` and ``push_back`` are similar but ``emplace_back`` is slightly more efficient because it skips the intermediate object creation
+- The `bestG` grid tracks the best known cost to reach each cell. the priority queue can hold multiple entries for the same cell, so when a node is popped its 'g' value is checked against `bestG`. If it is higher, the entry is skipped. This avoids extra entries in the queue.
+- Instead of writing four separate if-statements for up, down, left and right, two small direction arrays `dr` and `dc` are used and looped over in `explore_neighbors`.
+- Every cell in `bestG` is initialized to `INT_MAX`, representing infinity, meaning no route has been found to that cell yet. Any real path cost will always be lower, so the first time a cell is reached its cost will always be recorded.
 
 # grid.h
 ```c++
@@ -266,14 +298,26 @@ void printGrid(
 
 std::vector<std::vector<int>> generateGrid(std::pair<int, int> gridSize, std::pair<int, int> start, std::pair<int, int> goal);
 ```
+- `generateGrid` takes `gridSize`, `start`, and `goal` as `std::pair<int, int>`. Using a pair to represent a 2D coordinate keeps related values together and avoids having separate `rows` and `cols` parameters.
+- `generateGrid` handles creating the grid and `printGrid` handles displaying it.
 ## Grid.cpp
+
+### Generating Grid
 ``` c++
+#include "grid.h"
+#include <iostream>
+#include <set>
+#include <random>
+
 std::vector<std::vector<int>> generateGrid(std::pair<int, int> gridSize, std::pair<int, int> start, std::pair<int, int> goal)
 {
+
     int rows = gridSize.first;
     int cols = gridSize.second;
-
     std::vector<std::vector<int>> grid(rows, std::vector<int>(cols, 0));
+
+    std::mt19937 rng(std::random_device{}());
+    std::bernoulli_distribution dist(0.5);
 
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
@@ -281,14 +325,18 @@ std::vector<std::vector<int>> generateGrid(std::pair<int, int> gridSize, std::pa
             if (pos == start || pos == goal)
                 grid[r][c] = 0;             // always keep start/goal open
             else
-                grid[r][c] = (rand() % 2);  // 0 or 1
+                grid[r][c] = (dist(rng) ? 1 : 0);  // 0 or 1
         }
     }
 
     return grid;
 }
 ```
-I am generating a grid of size nxn, this function uses rand to generate a random grid of 0's and 1's. Doing it this way makes it very likely that the grid will not have a path. to counter act this I iterate through the grids(max of 10 times) until there is a path found.  
+
+- To generate a grid of size nxn, this function uses `std::mt19937` to fill the grid with random 0's and 1's. Doing it this way makes it very likely that the grid will not have a path. to counter act this I iterate through the grids(max of 10 times) until there is a path found.  
+- I initially used `rand()` but this was replaced with `std::mt19937`, a modern random number generator that produces much higher quality randomness. `rand()` is considered outdated in modern C++ because it has a short cycle and poor distribution on some compilers.
+- The start and goal cells are explicitly forced to 0 regardless of what `std::mt19937` produces. This guarantees A* always has a valid cell to begin and end on, preventing a situation where the algorithm immediately returns empty because the start or goal is a wall.
+
 
 ### Printing Grid
 ```c++
@@ -331,11 +379,10 @@ void printGrid(
 ```
 
 - This function prints a 2-D grid to the terminal with color coded symbols representing different cell types. Grid (S=start, G=goal, #=wall, .=open)
+- ANSI escape codes are used to add colour to the terminal output. Each cell type has its own colour. For example green for start, red for goal, yellow for path cells, and white for walls and open cells. This makes the grid much easier to read at a glance.
 - Originally I printed the grid with no additional colors, this worked but it was not as easy to tell what was going on without additional colors.
 
 ![[Pasted image 20260318070504.png]]
-
-
 # Testing
 
 ```c++
@@ -610,10 +657,141 @@ void runAllTests() {
 }
 ```
 
-- (explain what each test does)
+For Testing the A* algorithm, I wanted to test all the functions/functionality.
+## Helper Function Tests
 
+### test_heuristic
+
+- Verifies the Manhattan distance calculation.
+- Checks zero distance when start equals goal, pure horizontal/vertical distances. To check absolute values are used correctly.
+
+| Input          | Expected |
+| -------------- | -------- |
+| (0,0) -> (0,0) | 0        |
+| (0,0) -> (0,5) | 5        |
+| (0,0) -> (5,0) | 5        |
+| (0,0) -> (3,4) | 7        |
+| (5,5) -> (2,2  | 6        |
+
+### test_encode
+
+- Tests the function that flattens a 2D `(row, col)` position into a single integer using $row * width + col$.
+- Confirms the formula works for the first cell, the last cell of a row, the first cell of the next row, and different grid widths.
+
+| Input            | Expected |
+| ---------------- | -------- |
+| encode(3, 2, 10) | 32       |
+| encode(0, 0, 10) | 0        |
+| encode(2, 3, 5)  | 13       |
+| encode(0, 9, 10) | 9        |
+| encode(1, 0, 10) | 10       |
+
+### test_in_bounds
+
+- Checks boundary validation. Covers valid cells including corners, and all four out-of-bounds cases: negative row, negative column, row equal to height, and column equal to width. Also tests a 1×1 grid where only `(0,0)` is valid.
+
+| Input           | Expected |
+| --------------- | -------- |
+| (5,5) on 10×10  | true     |
+| (0,0) on 10×10  | true     |
+| (9,9) on 10×10  | true     |
+| (-1,5) on 10×10 | false    |
+| (5,-1) on 10×10 | false    |
+| (10,5) on 10×10 | false    |
+| (5,10) on 10×10 | false    |
+| (0,0) on 1×1    | true     |
+| (1,1) on 1×1    | false    |
+
+## A* Pathfinding Tests
+
+### test_astar_simple_path
+
+Runs A* on a clear 3×3 grid from (0,0) to (2,2). Confirms the path is non-empty, starts and ends at the correct cells, and has exactly 5 cells — the minimum for a Manhattan path across a 3×3 grid.
+
+```
+0 0 0
+0 0 0
+0 0 0
+```
+
+**Expected:** path of length 5, from (0,0) to (2,2).
+
+### test_astar_with_obstacles
+
+Runs A* on a 5×5 grid with two horizontal walls blocking direct routes. Confirms a path is still found, starts and ends correctly, and every cell along the path is walkable (value 0).
+
+```
+0 0 0 0 0
+0 1 1 1 0
+0 0 0 0 0
+0 1 1 1 0
+0 0 0 0 0
+```
+
+**Expected:** valid path from (0,0) to (4,4) through walkable cells only.
+
+### test_astar_start_is_wall
+
+Passes a grid where the start cell (0,0) is a wall. Expects an empty path, A* should bail out immediately rather than trying to navigate from an impassable cell.
+
+```
+1 0 0
+0 0 0
+0 0 0
+```
+
+**Expected:** empty path.
+
+### test_astar_goal_is_wall
+
+The goal cell (2,2) is a wall. Expects an empty path, there is no point navigating toward a destination that can never be reached.
+
+```
+0 0 0
+0 0 0
+0 0 1
+```
+
+**Expected:** empty path.
+
+### test_astar_no_path
+
+Uses a 3×3 grid where a cross of walls completely isolates (2,2) from (0,0). Confirms the algorithm returns an empty path rather than hanging or crashing.
+
+```
+0 1 0
+1 1 1
+0 1 0
+```
+
+**Expected:** empty path (no route exists).
+
+### test_astar_start_equals_goal
+
+Passes (1,1) as both start and goal on a clear 3×3 grid. The algorithm should recognise it is already at the destination and return a path containing exactly one cell.
+
+**Expected:** path of length `1` containing only (1,1).
+
+### test_astar_straight_line
+
+Uses a single-row 1×5 grid, forcing the only possible path to go straight right. Confirms the path has exactly 5 cells in the correct column order.
+
+```
+0 0 0 0 0
+```
+
+**Expected:** (0,0) -> (0,1) -> (0,2) -> (0,3) -> (0,4), length 5.
+
+### test_astar_large_grid
+
+Runs A* on a 20×20 empty grid from `(0,0)` to `(19,19)`. Confirms the path exists, has the correct endpoints, and is exactly 39 cells long — the minimum for a Manhattan distance of 38.
+
+**Expected:** path of length 39, from (0,0) to (19,19).
 
 
 # References
-https://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html
-http://geeksforgeeks.org/cpp/templates-cpp/
+
+- Amit Patel, _Introduction to A*_: https://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html
+- cppreference, _std::mt19937_: https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine
+- GeeksforGeeks, _C++ Templates_: https://www.geeksforgeeks.org/templates-cpp/
+- Wikipedia, _Manhattan Distance_: https://en.wikipedia.org/wiki/Taxicab_geometry
