@@ -266,7 +266,7 @@ vector<pair<int,int>> astar(
 }
 ```
 
-- using namespace std appears in AStarAlgorithm.cpp because it was generated with AI assistance. In the code written manually, using namespace std is avoided because placing it in a header file is considered bad practice. When a header file uses using namespace std, every file that includes it automatically inherits the entire std namespace, which can cause naming conflicts that are difficult to debug. For this reason, the manually written code uses the std:: prefix explicitly instead.
+- using ``namespace std`` appears in AStarAlgorithm.cpp because it was generated with AI assistance. In the code written manually, using namespace std is avoided because placing it in a header file is considered bad practice. When a header file uses using namespace std, every file that includes it automatically inherits the entire std namespace, which can cause naming conflicts that are difficult to debug. For this reason, the manually written code uses the std:: prefix explicitly instead.
 - ``heuristic()`` gets the Manhattan distance to the goal.
 - ``encode() ``turns rows and columns into a single number, for example for a 10 wide grid row 3, col 2 would be turned into 32. for an 11 wide grid row 3, col 2 would be turned into 35.
 - ``priority_queue`` gives you the smallest element first.
