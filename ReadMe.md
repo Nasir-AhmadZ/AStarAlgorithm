@@ -382,7 +382,9 @@ void printGrid(
 - ANSI escape codes are used to add colour to the terminal output. Each cell type has its own colour. For example green for start, red for goal, yellow for path cells, and white for walls and open cells. This makes the grid much easier to read at a glance.
 - Originally I printed the grid with no additional colors, this worked but it was not as easy to tell what was going on without additional colors.
 
-![[Pasted image 20260318070504.png]]
+<img width="364" height="485" alt="Pasted image 20260318070504" src="https://github.com/user-attachments/assets/5a1a7c26-3f28-442c-8b0f-27c40740a285" />
+
+
 # Testing
 
 ```c++
